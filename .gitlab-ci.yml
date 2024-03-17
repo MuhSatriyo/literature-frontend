@@ -74,4 +74,4 @@ test app:
     - chmod 644 ~/.ssh/known_hosts
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "wget --spider 103.175.219.100:3000"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "curl http://docker:3000/"

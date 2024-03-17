@@ -13,9 +13,9 @@ build docker:
   before_script:
     - docker info
   script:
-    - "docker build -t iansinambela/frontend:1.0 ."
+    - "docker build -t iansinambela/fe:2.0 ."
     - "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN"
-    - "docker push iansinambela/frontend:1.0"
+    - "docker push iansinambela/fe:2.0"
       
 
 pull image:
@@ -36,7 +36,7 @@ pull image:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
   script:
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN && docker pull iansinambela/frontend:1.0"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN && docker pull iansinambela/fe:2.0"
 
 run image:
   stage: run-on-server
@@ -55,7 +55,7 @@ run image:
     - chmod 644 ~/.ssh/known_hosts
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -d iansinambela/frontend:1.0"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -d iansinambela/fe:2.0"
 
 test app:
   stage: test-on-server

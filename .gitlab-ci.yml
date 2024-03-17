@@ -38,7 +38,7 @@ pull image:
   script:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN && docker pull iansinambela/fe:2.0"
 
-run image:
+run_image:
   stage: run-on-server
   image: docker
   services:
@@ -55,10 +55,10 @@ run image:
     - chmod 644 ~/.ssh/known_hosts
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -p 3000:3000 -d iansinambela/fe:2.0"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run --name run_image -p 3000:3000 -d iansinambela/fe:2.0"
     - sleep 15;
     - wget --spider http://103.175.219.100:3000/
-    - docker stop iansinambela/fe:2.0;
+    - docker stop run_image;
 
 deploy app:
   stage: deploy-on-server

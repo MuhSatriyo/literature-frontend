@@ -1,99 +1,54 @@
-.job_template_config: &sshconfig
+stages:
+  - build-using-runner
+  - pull-image-to-server
+  - run-on-server
+
+ 
+build docker:
+  stage: build-using-runner
+  image: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker info
+  script:
+    - "docker build -t iansinambela/frontend:1.0 ."
+    - "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN"
+    - "docker push iansinambela/frontend:1.0"
+      
+
+pull image:
+  stage: pull-image-to-server
+  image: docker
+  services:
+    - docker:dind
   before_script:
     - "which ssh-agent || ( apt-get install openssh-client )"
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > id_rsa
-    - chmod 600 id_rsa
-    - ssh-add id_rsa 
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan 103.150.92.227 >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - touch ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 id_rsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - eval $(ssh-agent -s)
+    - ssh-add id_rsa 
+  script:
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN && docker pull iansinambela/frontend:1.0"
+
+run image:
+  stage: run-on-server
+  image: docker
+  services:
+    - docker:dind
+  before_script:
+    - "which ssh-agent || ( apt-get install openssh-client )"
+    - mkdir -p ~/.ssh
+    - touch ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 id_rsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - eval $(ssh-agent -s)
+    - ssh-add id_rsa 
+  script:
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -d iansinambela/frontend:1.0"
  
 
-stages:
-  - pull_frontend
-  - build_app
-  - test_app
-  - deploy_app
-  - push_docker
-
-variables:
-  SERVER: 'paul@103.150.92.227'
-  DIR_FE: '/home/paul/literature-frontend'
-  BRANCH: 'main'
-  IMAGES_FE: 'ian/frontend:1.0'
-  DOMAIN_FE: 'https://sinambela.studentdumbways.my.id'
- 
-pull_frontend:
-  stage: pull_frontend
-  image: docker
-  services:
-    - docker:dind
-  <<: *sshconfig
-  script:
-    - ssh $SERVER 
-      "cd $DIR_FE;
-      git pull origin $BRANCH;
-      exit"
-      
-
-build_app:
-  stage: build_app
-  image: docker
-  services:
-    - docker:dind
-  <<: *sshconfig
-  script:
-    - ssh $SERVER
-     "cd $DIR_FE;
-     docker rmi $IMAGES_FE;
-     docker compose up -d database;
-     docker build -t $IMAGES_FE .;
-     docker images;
-     docker compose up -d;
-     exit"
-      
-
-test_app:
-  stage: test_app
-  image: docker
-  services:
-    - docker:dind
-  <<: *sshconfig
-  script:
-    - ssh $SERVER 
-     "docker ps -a;
-     wget --spider $DOMAIN_FE;
-     docker ps -a;
-     exit"
-       
-
-deploy_app:
-  stage: deploy_app
-  image: docker
-  services:
-    - docker:dind
-  <<: *sshconfig
-  script:
-    - ssh $SERVER 
-     "docker compose up -d;
-     docker compose ps -a;
-     exit"
-      
-
-push_docker:
-  stage: push_docker
-  image: docker
-  services:
-    - docker:dind
-  <<: *sshconfig 
-
-  script:
-    - ssh $SERVER 
-     "docker compose down;
-     docker push $IMAGES_FE;
-     docker compose up -d;
-     docker compose ps -a;
-     exit"

@@ -24,13 +24,16 @@ pull image:
     - docker:dind
   before_script:
     - "which ssh-agent || ( apt-get install openssh-client )"
-    - mkdir -p ~/.ssh
-    - touch ~/.ssh/id_rsa
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 id_rsa
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > id_rsa
+    - chmod 600 id_rsa
     - ssh-add id_rsa 
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -p 1234 103.175.219.100 >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
   script:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN && docker pull iansinambela/frontend:1.0"
 

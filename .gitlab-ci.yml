@@ -56,22 +56,5 @@ run image:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -p 3000:3000 -d iansinambela/fe:2.0"
-
-test app:
-  stage: test-on-server
-  image: docker
-  services:
-    - docker:dind
-  before_script:
-    - "which ssh-agent || ( apt-get install openssh-client )"
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > id_rsa
-    - chmod 600 id_rsa
-    - ssh-add id_rsa 
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -p 1234 103.175.219.100 >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  script:
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "curl http://103.175.219.100:3000/"
+    - sleep 15;
+    - wget --spider http://103.175.219.100:3000/

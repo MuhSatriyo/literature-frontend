@@ -80,5 +80,5 @@ deploy app:
     - chmod 644 ~/.ssh/known_hosts
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker compose up -d database && docker compose up -d backend"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker compose up -d database && docker compose up -d"
     - wget --spider https://literature.sinambela.studentdumbways.my.id

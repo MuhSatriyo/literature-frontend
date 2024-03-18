@@ -61,7 +61,6 @@ run_image:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker stop ian"
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker rmi -f iansinambela/fe:2.0"
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker system prune -f"
-    - docker ps -a
 
 
 deploy app:

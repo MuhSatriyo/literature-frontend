@@ -57,8 +57,7 @@ run_image:
   script:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -p 3000:3000 -d iansinambela/fe:2.0"
     - sleep 15;
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "echo $PASSWORD | sudo -S apt-get install -y curl"
-    - curl http://localhost:3000
+    - wget --spider http://localhost:3000/
 
 deploy app:
   stage: deploy-on-server

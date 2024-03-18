@@ -1,7 +1,7 @@
 stages:
   - build-using-runner
   - pull-image-to-server
-  - run-on-server
+  - testting
   - deploy-on-server
 
  
@@ -39,7 +39,7 @@ pull image:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker login -u $REGISTRY_USER -p $REGISTRY_TOKEN && docker pull iansinambela/fe:2.0"
 
 run_image:
-  stage: run-on-server
+  stage: testting
   image: docker
   services:
     - docker:dind

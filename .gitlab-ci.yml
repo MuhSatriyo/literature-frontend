@@ -57,7 +57,7 @@ run_image:
   script:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -p 3000:3000 -d iansinambela/fe:2.0"
     - sleep 15;
-    - wget --spider http://103.175.219.100:3000/
+    - wget --spider http://localhost:3000/
 
 deploy app:
   stage: deploy-on-server

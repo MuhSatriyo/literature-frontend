@@ -57,8 +57,9 @@ run_image:
   script:
     - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run -p 3000:3000 -d iansinambela/fe:2.0"
     - sleep 15;
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "wget --spider http://103.175.219.100:3000"
-    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker run --rm iansinambela/fe:2.0"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "wget --spider http://localhost:3000"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker stop iansinambela/fe:2.0"
+    - ssh -o StrictHostKeyChecking=no $VAR_USER@$VAR_IP -p $VAR_PORT "docker rmi -f iansinambela/fe:2.0"
     - docker ps -a
 
 
